@@ -1,0 +1,18 @@
+logs
+zonal_logs
+app.log
+results
+weights
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Editor
+.vscode/
+
+# Binary assets not needed to run the app (HF Spaces rejects non-LFS binaries)
+PIAUNet/Architecture.jpg
+PIAUNet/PB_Architecture.png
+
