@@ -3,3 +3,11 @@ zonal_logs
 app.log
 results
 weights
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Editor
+.vscode/
