@@ -97,7 +97,7 @@ if not WEIGHTS_PATH.exists():
         from huggingface_hub import hf_hub_download
         WEIGHTS_PATH.parent.mkdir(parents=True, exist_ok=True)
         downloaded = hf_hub_download(
-            repo_id="MahboobAlam0/piau-net-fish-weights",
+            repo_id="mahboobalam0/piaunet",
             filename="best_model.pth",
             local_dir="weights",
         )
@@ -106,7 +106,7 @@ if not WEIGHTS_PATH.exists():
     except Exception as e:
         raise SystemExit(
             f"Fatal: weights/best_model.pth not found locally and HF Hub download failed.\n"
-            f"Upload the file to: https://huggingface.co/MahboobAlam0/piau-net-fish-weights\n"
+            f"Repo: https://huggingface.co/mahboobalam0/piaunet\n"
             f"Error: {e}"
         )
 
