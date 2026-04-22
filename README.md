@@ -1,4 +1,17 @@
+---
+title: Fish Density Monitoring System
+emoji: 🐟
+colorFrom: blue
+colorTo: cyan
+sdk: gradio
+sdk_version: "4.44.0"
+app_file: app.py
+pinned: false
+license: apache-2.0
+---
+
 # Fish Density Monitoring System
+
 
 A real-time fish instance segmentation and zonal density monitoring system powered by a **Physics-Informed Attention U-Net (PIAU-Net)**, with a Gradio web interface, Grad-CAM explainability, and temporal video analysis.
 

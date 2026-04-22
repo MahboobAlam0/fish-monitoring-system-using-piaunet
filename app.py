@@ -50,9 +50,13 @@ from pipeline.temporal_gradcam import TemporalGradCAM
 import numpy as np
 
 # Production logging configuration
-LOG_DIR = Path("logs")
+# On HF Spaces (Linux) write logs to /tmp — the working directory is read-only
+_IS_HF = os.path.exists("/tmp") and not os.name == "nt"
+_TMP_ROOT = Path("/tmp") if _IS_HF else Path(".")
+
+LOG_DIR = _TMP_ROOT / "logs"
 LOG_DIR.mkdir(exist_ok=True)
-RESULTS_DIR = Path("results")
+RESULTS_DIR = _TMP_ROOT / "results"
 RESULTS_DIR.mkdir(exist_ok=True)
 
 logging.basicConfig(
@@ -75,19 +79,45 @@ class _WindowsAsyncioFilter(logging.Filter):
 logging.getLogger("asyncio").addFilter(_WindowsAsyncioFilter())
 
 logger = logging.getLogger(__name__)
+# ── Device auto-detection (HF free tier = CPU, local = CUDA if available) ────
+device = "cuda" if torch.cuda.is_available() else "cpu"
 logger.info("="*60)
 logger.info("Zonal Density Monitoring System - Starting")
-logger.info(f"Device: {DEVICE}")
+logger.info(f"Device: {device}")
 logger.info("="*60)
 
-# Load model with error handling
+# ── Weight loading with HF Hub fallback ───────────────────────────────────────
+# weights/ is in .gitignore so it won't be in the repo.
+# On HF Spaces the file is downloaded from the model repo at startup.
+WEIGHTS_PATH = Path("weights/best_model.pth")
+
+if not WEIGHTS_PATH.exists():
+    logger.info("Weights not found locally — downloading from Hugging Face Hub...")
+    try:
+        from huggingface_hub import hf_hub_download
+        WEIGHTS_PATH.parent.mkdir(parents=True, exist_ok=True)
+        downloaded = hf_hub_download(
+            repo_id="MahboobAlam0/piau-net-fish-weights",
+            filename="best_model.pth",
+            local_dir="weights",
+        )
+        WEIGHTS_PATH = Path(downloaded)
+        logger.info(f"Weights downloaded: {WEIGHTS_PATH}")
+    except Exception as e:
+        raise SystemExit(
+            f"Fatal: weights/best_model.pth not found locally and HF Hub download failed.\n"
+            f"Upload the file to: https://huggingface.co/MahboobAlam0/piau-net-fish-weights\n"
+            f"Error: {e}"
+        )
+
+# Load model
 try:
-    device = DEVICE
-    model = load_model("weights/best_model.pth", device)
+    model = load_model(str(WEIGHTS_PATH), device)
     logger.info("Model loaded successfully")
 except Exception as e:
     logger.error(f"Failed to load model: {str(e)}")
     raise SystemExit(f"Fatal: Cannot start without model. {str(e)}")
+
 
 def _warmup_model(model, device, height=512, width=512, num_runs=2):
     """Warm up model with dummy inference passes to avoid slow first frame"""
@@ -1007,6 +1037,21 @@ Frame | Confidence | CAM Activation
 ✓ Variable Activation   = Attention shifts based on fish location/visibility
 """
         logger.info(f"[VIDEO XAI] Analysis complete. Temp file: {tmp.name}")
+
+        # Schedule temp file deletion after a short delay so Gradio has time
+        # to stream it to the browser before it disappears from disk.
+        def _cleanup(path: str, delay: float = 30.0):
+            import threading, time as _time
+            def _delete():
+                _time.sleep(delay)
+                try:
+                    os.unlink(path)
+                    logger.info(f"[VIDEO XAI] Temp file cleaned up: {path}")
+                except Exception:
+                    pass
+            threading.Thread(target=_delete, daemon=True).start()
+
+        _cleanup(tmp.name)
         return tmp.name, stats_text
 
     except Exception as e:
