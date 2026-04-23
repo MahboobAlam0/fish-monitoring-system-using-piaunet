@@ -157,12 +157,6 @@ def _save_session_metadata(session_id: str, metadata: Dict[str, Any]) -> None:
 def _generate_legend_html(legend_data: Dict[str, int]) -> str:
     """
     Generate professional HTML legend for zone summary display
-    
-    Args:
-        legend_data: Dictionary with zone counts by level
-    
-    Returns:
-        HTML string for legend display
     """
     html = """
     <div style="
@@ -268,42 +262,24 @@ def _get_input_preview(input_file: str) -> Tuple[Optional[Any], Optional[str]]:
     return None, None
 
 
+# NOTE: Type hints removed to bypass Gradio API parsing bug
 def process_with_integrated_analysis(
     input_file,
-    grid_rows: int,
-    grid_cols: int,
-    alert_threshold: str,
-    show_heatmap: bool,
-    show_zones: bool,
-    show_summary: bool,
-    show_summary_panel: bool,
-    use_sliding_window: bool,
-    enable_xai: bool,
-    enable_video_xai: bool,
-    video_sample_rate: int,
-    video_max_frames: int
-) -> Tuple[Optional[Any], Optional[Any], Optional[str], Optional[Any], str, str, Optional[Any], Optional[str], Optional[str], Optional[str], Optional[str]]:
+    grid_rows,
+    grid_cols,
+    alert_threshold,
+    show_heatmap,
+    show_zones,
+    show_summary,
+    show_summary_panel,
+    use_sliding_window,
+    enable_xai,
+    enable_video_xai,
+    video_sample_rate,
+    video_max_frames
+):
     """
     Process image/video with zonal density monitoring + optional XAI explanation.
-    
-    Args:
-        input_file: Input image or video file
-        grid_rows: Number of zone grid rows
-        grid_cols: Number of zone grid columns
-        alert_threshold: Alert density threshold level
-        show_heatmap: Display density heatmap
-        show_zones: Display zone grid overlay
-        show_summary: Display summary statistics
-        show_summary_panel: Display summary panel
-        use_sliding_window: Enable sliding window inference
-        enable_xai: Generate Seg-Grad-CAM explanation (images only)
-        enable_video_xai: Generate Temporal CAM for videos
-        video_sample_rate: Frame sample rate for video XAI
-        video_max_frames: Max frames for video XAI
-    
-    Returns:
-        Tuple of (input_image, video_output, image_output, input_video, report, legend_html, 
-                  xai_visualization, xai_text, xai_download_file, video_xai_output, video_xai_text)
     """
     # First, run the standard zonal density analysis
     input_image, video_output, image_output, input_video, report, legend_html = process_with_zonal_density(
@@ -361,37 +337,21 @@ def process_with_integrated_analysis(
     return input_image, video_output, image_output, input_video, report, legend_html, xai_visualization, xai_text, str(xai_download_file) if xai_download_file else None, video_xai_output, video_xai_text
 
 
+# NOTE: Type hints removed to bypass Gradio API parsing bug
 def process_with_zonal_density(
     input_file, 
-    grid_rows: int, 
-    grid_cols: int, 
-    alert_threshold: str, 
-    show_heatmap: bool, 
-    show_zones: bool, 
-    show_summary: bool,
-    show_summary_panel: bool,
-    use_sliding_window: bool
-) -> Tuple[Optional[Any], Optional[Any], Optional[str], Optional[Any], str, str]:
+    grid_rows, 
+    grid_cols, 
+    alert_threshold, 
+    show_heatmap, 
+    show_zones, 
+    show_summary,
+    show_summary_panel,
+    use_sliding_window
+):
     """
     Process image/video with zonal density monitoring.
-    
-    Args:
-        input_file: Input image or video file
-        grid_rows: Number of zone grid rows
-        grid_cols: Number of zone grid columns
-        alert_threshold: Alert density threshold level
-        show_heatmap: Display density heatmap
-        show_zones: Display zone grid overlay
-        show_summary: Display summary statistics
-        use_sliding_window: Enable sliding window inference
-    
-    Returns:
-        Tuple of (input_image, processed_video, processed_image, input_video, report, legend_html)
-    
-    Raises:
-        ValueError: On invalid inputs
     """
-    
     session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     start_time = time.time()
     
@@ -407,7 +367,7 @@ def process_with_zonal_density(
         if not input_path.exists():
             raise ValueError(f"File not found: {input_file}")
         
-        if not (grid_rows > 0 and grid_cols > 0):
+        if not (int(grid_rows) > 0 and int(grid_cols) > 0):
             raise ValueError("Grid dimensions must be positive")
         
         ext = input_path.suffix.lower()
@@ -421,8 +381,8 @@ def process_with_zonal_density(
         # Initialize components
         mask_processor = MaskProcessor()
         zonal_monitor = ZonalDensityMonitor(
-            grid_rows=grid_rows,
-            grid_cols=grid_cols,
+            grid_rows=int(grid_rows),
+            grid_cols=int(grid_cols),
             low_threshold=ZONAL_LOW_THRESHOLD,
             medium_threshold=ZONAL_MEDIUM_THRESHOLD,
             high_threshold=ZONAL_HIGH_THRESHOLD,
@@ -863,12 +823,6 @@ def _generate_zonal_video_report(
 def explain_prediction_image(input_file) -> Tuple[Any, str]:
     """
     Generate XAI explanation for a single image using Seg-Grad-CAM.
-    
-    Args:
-        input_file: Path to input image
-    
-    Returns:
-        Tuple of (visualization_figure, explanation_text)
     """
     if input_file is None:
         return None, "Error: No image provided. Please upload an image."
@@ -1223,7 +1177,7 @@ with gr.Blocks(title="Fish Density Monitoring System", theme=minimal_theme, css=
                     legend_output = gr.HTML(value="<p style='color:#64748b; font-style:italic;'>Awaiting analysis...</p>")
                     
             # Row 3: XAI Views
-            with Row():
+            with gr.Row():
                 with gr.Column(elem_classes="panel-wrapper"):
                     gr.HTML("<div class='panel-header'>Explainable AI (Image)</div>")
                     xai_visualization = gr.Image(label="Heatmap", show_label=False, elem_classes="media-view")
@@ -1251,7 +1205,8 @@ with gr.Blocks(title="Fish Density Monitoring System", theme=minimal_theme, css=
             input_image_preview, video_output, image_output, input_video_preview, 
             report_output, legend_output, xai_visualization, xai_text, xai_dummy_download,
             video_xai_output, video_xai_text
-        ]
+        ],
+        api_name=False  # <--- THIS BYPASSES THE GRADIO SCHEMA BUG!
     )
 
 if __name__ == "__main__":
