@@ -1223,7 +1223,7 @@ with gr.Blocks(title="Fish Density Monitoring System", theme=minimal_theme, css=
                     legend_output = gr.HTML(value="<p style='color:#64748b; font-style:italic;'>Awaiting analysis...</p>")
                     
             # Row 3: XAI Views
-            with gr.Row():
+            with Row():
                 with gr.Column(elem_classes="panel-wrapper"):
                     gr.HTML("<div class='panel-header'>Explainable AI (Image)</div>")
                     xai_visualization = gr.Image(label="Heatmap", show_label=False, elem_classes="media-view")
@@ -1264,7 +1264,6 @@ if __name__ == "__main__":
         server_port=7860,
         show_error=True,
         share=False,
-        quiet=False,
-        css=CSS_STYLE
+        quiet=False
     )
     logger.info("Server terminated")
