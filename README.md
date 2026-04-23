@@ -2,7 +2,7 @@
 title: Fish Density Monitoring System
 emoji: 🐟
 colorFrom: blue
-colorTo: cyan
+colorTo: indigo
 sdk: gradio
 sdk_version: "4.44.0"
 app_file: app.py
