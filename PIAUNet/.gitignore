@@ -1,24 +1,58 @@
-AquaOV255
-.venv
-.vscode
-__pycache__
-checkpoints
-checkpoints_baselines
-checkpoints_suim
-checkpoints_suim_finetune
-Fish Dataset
-results
-results_test
-results_tuning
-SUIM
-temp_splits
-test_visuals_baselines
-tuning_results
-bad_masks.txt
-test_results
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
 physics_model.ipynb
-checkpoints_baselines_1
-checkpoints_baselines_2
-test_visuals_baselines_aqua
-test_visuals_baselines_aqua_1
-test_deeplabv3_results
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Model checkpoints (large binaries — download separately)
+checkpoints/
+checkpoints_baselines/
+checkpoints_baselines_1/
+checkpoints_baselines_2/
+checkpoints_suim/
+checkpoints_suim_finetune/
+
+# Datasets (large — download separately)
+AquaOV255/
+Fish Dataset/
+SUIM/
+
+# Experiment outputs
+results/
+results_test/
+results_tuning/
+tuning_results/
+temp_splits/
+bad_masks.txt
+test_results/
+
+# Baseline test outputs (large image dumps)
+test_visuals_baselines/
+test_visuals_baselines_aqua/
+test_visuals_baselines_aqua_1/
+test_deeplabv3_results/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
