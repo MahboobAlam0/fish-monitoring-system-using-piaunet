@@ -90,7 +90,7 @@ Each panel shows: **Input Image | Ground Truth Mask | PIAU-Net Prediction**.
 ## Architecture
 
 <p align="center">
-  <img src="./PB_Architecture.png" alt="Physics Branch Architecture" width="70%"/>
+  <img src="PB_Architecture.png" alt="Physics Branch Architecture" width="70%"/>
 </p>
 
 The encoder–decoder backbone follows U-Net. The key additions are:
@@ -288,3 +288,10 @@ If you use this work, please cite:
   year    = {2025}
 }
 ```
+
+---
+
+## Links
+
+- GitHub: [github.com/MahboobAlam0/piaunet](https://github.com/MahboobAlam0/piaunet)
+- Hugging Face Model: [huggingface.co/mahboobalam0/piaunet](https://huggingface.co/mahboobalam0/piaunet)
